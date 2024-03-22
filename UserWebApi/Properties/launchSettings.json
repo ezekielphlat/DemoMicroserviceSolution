@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "ProductWebApi": {
+    "UserWebApi": {
       "commandName": "Project",
       "launchBrowser": false,
       "launchUrl": "",
@@ -8,7 +8,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5042"
+      "applicationUrl": "http://localhost:5062"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -33,7 +33,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:3782",
+      "applicationUrl": "http://localhost:64159",
       "sslPort": 0
     }
   }

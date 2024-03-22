@@ -5,7 +5,11 @@
       "commandVersion": "1.0",
       "serviceActions": {
         "customerwebapi": "StartDebugging",
-        "productwebapi": "StartDebugging"
+        "productwebapi": "StartDebugging",
+        "orderwebapi": "StartDebugging",
+        "userwebapi": "StartDebugging",
+        "apigateway": "StartDebugging",
+        "inventorywebapi": "StartDebugging"
       }
     }
   }

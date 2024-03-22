@@ -13,6 +13,8 @@ services:
         - backend
     ports:
         - 8001:1433
+
+
   customerwebapi:
     container_name: customer-api
     image: ${DOCKER_REGISTRY-}customerwebapi
@@ -21,8 +23,7 @@ services:
       dockerfile: CustomerWebApi/Dockerfile
     networks:
         - backend
-    ports:
-        - 8002:80
+    
     environment:
         - DB_HOST=customerdb
         - DB_NAME=dms_customer
@@ -37,6 +38,9 @@ services:
         - 8003:3306
     networks:
         - backend
+
+
+
   productwebapi:
     container_name: product-api
     image: ${DOCKER_REGISTRY-}productwebapi
@@ -45,10 +49,107 @@ services:
       dockerfile: ProductWebApi/Dockerfile
     networks:
         - backend
-    ports:
-        - 8004:80
+    
     environment:
         - DB_HOST=productdb
         - DB_NAME=dms_product
         - DB_ROOT_PASSWORD=password@12345#
+  orderdb:
+    container_name: order-db
+    image: mongo
+    ports:
+        - 8005:27017
+    networks:
+        - backend
+
+  rabbitmq:
+    container_name: rabbit-mq
+    image: rabbitmq:3-management
+    ports:
+        - 9001:15672
+    environment:
+        - RABBITMQ_DEFAULT_VHOST=dms
+        - RABBITMQ_DEFAULT_USER=administrator
+        - RABBITMQ_DEFAULT_PASS=admin
+    networks:
+        - backend
+  # order api orchestration
+  orderwebapi:
+    container_name: order-api
+    image: ${DOCKER_REGISTRY-}orderwebapi
+    build:
+      context: .
+      dockerfile: OrderWebApi/Dockerfile
+    
+    networks:
+        - backend
+    environment:
+        - DB_HOST=orderdb
+        - DB_NAME=dms_order
+        - RMQ_HOST=rabbitmq
+        - RMQ_DEFAULT_HOST=dms
+        - RMQ_USER=administrator
+        - RMQ_PASS=admin
+    depends_on:
+        - orderdb
+        - rabbitmq
+        - inventorywebapi
+  
+  userdb:
+    container_name: user-db
+    image: postgres
+    ports:
+        - 8007:5432
+    environment:
+        - POSTGRES_PASSWORD=P@ssw0rd
+    networks:
+        - backend
+
+  userwebapi:
+    container_name: user-api
+    image: ${DOCKER_REGISTRY-}userwebapi
+    build:
+      context: .
+      dockerfile: UserWebApi/Dockerfile
+   
+    networks:
+        - backend
+    environment:
+        - DB_HOST=userdb
+        - DB_NAME=dms_user
+        - DB_POSTGRES_PASSWORD=P@ssw0rd
+    depends_on:
+        - userdb
+
+
+  apigateway:
+    container_name: api-gateway
+    image: ${DOCKER_REGISTRY-}apigateway
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    ports:
+        - 8000:80 
+    networks:
+        - backend
+
+  inventorywebapi:
+    container_name: inventory-api
+    image: ${DOCKER_REGISTRY-}inventorywebapi
+    build:
+      context: .
+      dockerfile: InventoryWebApi/Dockerfile
+    networks:
+        - backend
+    environment:
+        - DB_HOST=userdb
+        - DB_NAME=dms_inventory
+        - DB_POSTGRES_PASSWORD=P@ssw0rd
+        - RMQ_HOST=rabbitmq
+        - RMQ_DEFAULT_HOST=dms
+        - RMQ_USER=administrator
+        - RMQ_PASS=admin
+    depends_on:
+        - userdb
+        - rabbitmq
 
